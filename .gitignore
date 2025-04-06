@@ -1,0 +1,8 @@
+.idea/
+file/
+.env
+
+**/__pycache__/
+
+src/video/my_videos
+src/cryptography/encrypted_files
