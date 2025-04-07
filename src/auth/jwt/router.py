@@ -25,6 +25,44 @@ def create_jwt_token(user_name: str, time: int) -> str:
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
+def set_access_token_cookie(response: JSONResponse, token: str, time: int):
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {token}",
+        max_age=time,
+        secure=True,
+        httponly=True,
+        samesite="Strict"
+    )
+
+def delete_access_token_cookie(response: JSONResponse):
+    response.delete_cookie("access_token")
+
+# Зависимость для получения токена из куки
+def get_token_from_cookie(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not logged in or invalid token")
+    return token
+
+def verify_token(token: str) -> dict:
+    try:
+        if token.startswith("Bearer "):
+            token = token[7:]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+
+def get_current_user(token: Annotated[str, Depends(get_token_from_cookie)]) -> str:
+    payload = verify_token(token)
+    user_name = payload.get("sub")
+    if user_name is None:
+        raise HTTPException(status_code=400, detail="Token does not contain user information")
+    return user_name
+
 @router.post("/reg")
 async def user_reg(reg: Annotated[RegUser, Body()]):
 
@@ -54,42 +92,9 @@ async def user_log(log: Annotated[LogUser, Body()]):
         content={"message": f"User {log.user_name} logged in successfully"}
     )
 
-    response.set_cookie(
-        key="access_token",  # Имя куки
-        value=f"Bearer {token}",  # Значение куки, включая префикс Bearer
-        #httponly=True,  # Недоступно через JavaScript (для предотвращения XSS атак)
-        max_age=time,  # Время жизни куки (в секундах)
-        #expires=datetime.utcnow() + timedelta(seconds=time),  # Время истечения куки
-        secure=True,  # (Рекомендуется использовать, если сервер работает по HTTPS)
-        #samesite="Strict" # Ограничивает доступность куки в контексте других сайтов
-    )
+    set_access_token_cookie(response, token, time)
 
     return response
-
-# Зависимость для получения токена из куки
-def get_token_from_cookie(request: Request):
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not logged in or invalid token")
-    return token
-
-def verify_token(token: str) -> dict:
-    try:
-        if token.startswith("Bearer "):
-            token = token[7:]
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError as e:
-        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
-
-def get_current_user(token: Annotated[str, Depends(get_token_from_cookie)]) -> str:
-    payload = verify_token(token)
-    user_name = payload.get("sub")
-    if user_name is None:
-        raise HTTPException(status_code=400, detail="Token does not contain user information")
-    return user_name
 
 @router.get("/check_user")
 async def user_check(user_name: Annotated[str, Depends(get_current_user)]):
@@ -98,7 +103,6 @@ async def user_check(user_name: Annotated[str, Depends(get_current_user)]):
         status_code=200,
         content={"message": f"User in system", "user_name": user_name}
     )
-    response.delete_cookie("access_token")
 
     return response
 
@@ -109,6 +113,6 @@ async def user_logout(token: Annotated[str, Depends(get_token_from_cookie)]):
         status_code=200,
         content={"message": f"User logout in successfully"}
     )
-    response.delete_cookie("access_token")
+    delete_access_token_cookie(response)
 
     return response
