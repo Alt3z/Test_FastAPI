@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 
-from src.cryptography.hash.models import HashMethod, hash_functions
+from src.cryptography.hash.schemas import HashMethod, hash_functions
 
 
 router = APIRouter(

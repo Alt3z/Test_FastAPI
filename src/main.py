@@ -5,10 +5,12 @@ from src.cryptography.symmetric_encryption.router import router as router_crypto
 
 from src.video.router import router as router_video
 
+from src.auth.jwt.router import router as router_jwt
+
 app = FastAPI(
     title="Afina",
-    description="Шифрование, хэщ, видео, стороннее API",
-    version="0.0.1"
+    description="Шифрование, хэъ, видео, БД",
+    version="0.0.2"
 )
 
 #app.include_router(router_cryptography_symmetric_encryption)
@@ -16,3 +18,4 @@ app = FastAPI(
 
 #app.include_router(router_video)
 
+app.include_router(router_jwt)

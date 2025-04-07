@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 
 from pathlib import Path
 
-from src.cryptography.symmetric_encryption.models import SymEncMethod
+from src.cryptography.symmetric_encryption.schemas import SymEncMethod
 from src.cryptography.symmetric_encryption.my_crypters.aes.aes import aes128
 
 from src.config import ENC_FILE_PATH
