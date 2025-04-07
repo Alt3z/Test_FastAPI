@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from src.database import async_session_maker
 
 from src.auth.models import Registration
-from src.auth.schemas import RegUser
+from src.auth.schemas import RegUser, LogUser
 
 from src.config import ALGORITHM_HASH_PASSWORD
 
@@ -49,3 +49,16 @@ async def add_new_user_in_db(reg: RegUser):
         )
         await session.execute(stmt)
         await session.commit()
+
+async def check_user(user_name: str, password: str):
+    async with async_session_maker() as session:
+        # Формируем условие поиска по email или телефону
+        stmt = select(Registration).where(Registration.user_name == user_name)
+
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()  # Возвращает первого пользователя или None, если не найден
+
+        if user and pwd_context.verify(password, user.hashed_password):
+            return user
+
+        return None
