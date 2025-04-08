@@ -16,6 +16,6 @@ app = FastAPI(
 #app.include_router(router_cryptography_symmetric_encryption)
 #app.include_router(router_cryptography_hash)
 
-#app.include_router(router_video)
+app.include_router(router_video)
 
-app.include_router(router_jwt)
+#app.include_router(router_jwt)

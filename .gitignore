@@ -4,6 +4,7 @@ file/
 
 **/__pycache__/
 
-src/create_tables.py
+src/scripts
+
 src/video/my_videos
 src/cryptography/encrypted_files
