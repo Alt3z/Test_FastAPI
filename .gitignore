@@ -4,6 +4,11 @@ file/
 
 **/__pycache__/
 
+kafka/Kafka.txt
+
+kafka/enc_log.txt
+kafka/hash_log.txt
+
 src/scripts
 
 src/video/my_videos

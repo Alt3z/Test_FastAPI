@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter,HTTPException, File, UploadFile, Form
 from fastapi.responses import FileResponse
@@ -6,14 +7,16 @@ from pathlib import Path
 
 from src.cryptography.symmetric_encryption.schemas import SymEncMethod
 from src.cryptography.symmetric_encryption.my_crypters.aes.aes import aes128
-
-from src.config import ENC_FILE_PATH
+from src.kafka_manager import KafkaManager
+from src.config import ENC_FILE_PATH, KAFKA_SERVERS
 
 
 router = APIRouter(
     prefix="/cryptography_symmetric_encryption",
     tags=["Сryptography"],
 )
+
+kafka_manager = KafkaManager(bootstrap_servers=KAFKA_SERVERS)
 
 enc_param = {
     "aes128": {"key_len": 16, "iv_len": 16}
@@ -72,6 +75,16 @@ async def encrypt_text(method: Annotated[SymEncMethod, Form(description="Мет�
                 filename=file_path.name,
                 headers={"Content-Disposition": f"attachment; filename={file_path.name}"}
             )
+
+        # Отправка события в Kafka
+        event = {
+            "event": "ENC_TEXT",
+            "details": {
+                "text_length": len(enc_content),
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+        await kafka_manager.send_event("enc_log", event)
 
         return {"enc_text": enc_content}
     except HTTPException as e:
