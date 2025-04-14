@@ -8,7 +8,8 @@ async def consume_logs():
     consumer = AIOKafkaConsumer(
         "hash_log", "enc_log",  # Подписка сразу на 2 темы
         bootstrap_servers=KAFKA_SERVERS,
-        group_id="combined-log-consumer"
+        group_id="combined-log-consumer",
+        auto_offset_reset="earliest"
     )
     await consumer.start()
 

@@ -12,6 +12,7 @@ services:
       - postgres
       - redis
       - kafka
+      - init-kafka
     env_file:
       - .env  # Указываем путь к вашему .env
     volumes:
@@ -55,3 +56,13 @@ services:
       - zookeeper
     ports:
       - "9092:9092"
+
+  init-kafka:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: [ "python", "kafka/init_kafka_topics.py" ]
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_SERVERS: kafka:9092
