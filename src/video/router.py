@@ -22,7 +22,7 @@ router = APIRouter(
 
 
 # Создаём асинхронный пул соединений
-redis_pool = ConnectionPool(host='localhost', port=6379, db=0, decode_responses=True)
+redis_pool = ConnectionPool(host='redis_cache', port=6379, db=0, decode_responses=True)
 redis_client = redis.Redis(connection_pool=redis_pool)
 
 folder_path = Path(MY_VIDEOS_PATH)
