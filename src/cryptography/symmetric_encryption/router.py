@@ -41,12 +41,12 @@ async def encrypt_text(method: Annotated[SymEncMethod, Form(description="Мет�
 
         if len(key) != enc_param[method]["key_len"]:
             raise HTTPException(status_code=400,
-                                detail=f"The length of the key must be {enc_param[method]["key_len"]}")
+                                detail=f"The length of the key must be {enc_param[method]['key_len']}")
 
         if iv is not None:
             if len(iv) != enc_param[method]["iv_len"]:
                 raise HTTPException(status_code=400,
-                                    detail=f"The length of the vector must be {enc_param[method]["iv_len"]}")
+                                    detail=f"The length of the vector must be {enc_param[method]['iv_len']}")
 
         file_name = None
         content = text
@@ -108,12 +108,12 @@ async def decrypt_text(method: Annotated[SymEncMethod, Form(description="Мет�
 
         if len(key) != enc_param[method]["key_len"]:
             raise HTTPException(status_code=400,
-                                detail=f"The length of the key must be {enc_param[method]["key_len"]}")
+                                detail=f"The length of the key must be {enc_param[method]['key_len']}")
 
         if iv is not None:
             if len(iv) != enc_param[method]["iv_len"]:
                 raise HTTPException(status_code=400,
-                                    detail=f"The length of the vector must be {enc_param[method]["iv_len"]}")
+                                    detail=f"The length of the vector must be {enc_param[method]['iv_len']}")
 
         file_name = None
         content = text
