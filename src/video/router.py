@@ -25,8 +25,6 @@ router = APIRouter(
 redis_pool = ConnectionPool(host='localhost', port=6379, db=0, decode_responses=True)
 redis_client = redis.Redis(connection_pool=redis_pool)
 
-#redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-
 folder_path = Path(MY_VIDEOS_PATH)
 
 async def get_video_list():

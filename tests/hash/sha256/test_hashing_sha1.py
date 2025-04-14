@@ -13,7 +13,7 @@ async def test_generate_hash_with_text():
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             data = {
-                "method": "sha256",
+                "method": "sha1",
                 "text": "test text"
             }
             response = await ac.post("/cryptography/hash/", data=data)
@@ -24,7 +24,7 @@ async def test_generate_hash_with_text():
             assert "Hash" in response_json
 
             hash_value = response_json["Hash"]
-            assert len(hash_value) == 64
+            assert len(hash_value) == 40
 
 @pytest.mark.asyncio
 async def test_generate_hash_with_file():
@@ -35,7 +35,7 @@ async def test_generate_hash_with_file():
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             file_content = b"test file content"
             files = {
-                "method": (None, "sha256"),
+                "method": (None, "sha1"),
                 "upload_file": ("test_file.txt", file_content, "text/plain"),
             }
 
@@ -51,4 +51,4 @@ async def test_generate_hash_with_file():
             file_name = response_json["File_name"]
 
             assert file_name == "test_file.txt"
-            assert len(file_hash) == 64
+            assert len(file_hash) == 40

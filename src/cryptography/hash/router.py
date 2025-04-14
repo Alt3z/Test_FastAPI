@@ -1,10 +1,6 @@
-from datetime import datetime
-
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
+from datetime import datetime
 from typing import Annotated
-
-from aiokafka import AIOKafkaProducer
-import json, asyncio
 
 from src.cryptography.hash.schemas import HashMethod, hash_functions
 from src.kafka_manager import KafkaManager
@@ -18,11 +14,13 @@ router = APIRouter(
 
 kafka_manager = KafkaManager(bootstrap_servers=KAFKA_SERVERS)
 
+
 async def validate_input(text: str | None, upload_file: UploadFile | None):
     if text and upload_file:
         raise HTTPException(status_code=400, detail="Hash error: must be either text or file")
     if not text and not upload_file:
         raise HTTPException(status_code=400, detail="Hash error: no information provided for hashing")
+
 
 @router.post("/hash/")
 async def generate_hash(method: Annotated[HashMethod, Form(description="Метод хэширования")],
