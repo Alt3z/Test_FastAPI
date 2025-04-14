@@ -2,11 +2,12 @@ import asyncio
 from aiokafka import AIOKafkaConsumer
 import json
 
+from src.config import KAFKA_SERVERS
 
 async def consume_logs():
     consumer = AIOKafkaConsumer(
         "hash_log", "enc_log",  # Подписка сразу на 2 темы
-        bootstrap_servers="localhost:9092",
+        bootstrap_servers=KAFKA_SERVERS,
         group_id="combined-log-consumer"
     )
     await consumer.start()
