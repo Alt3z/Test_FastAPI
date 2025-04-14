@@ -19,3 +19,5 @@ DB_PASS = os.environ.get("DB_PASS")
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = os.environ.get("ALGORITHM")
+
+KAFKA_SERVERS = os.getenv("KAFKA_SERVERS")

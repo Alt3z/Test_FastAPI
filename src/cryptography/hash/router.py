@@ -1,7 +1,10 @@
-from typing import Annotated
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
+from datetime import datetime
+from typing import Annotated
 
 from src.cryptography.hash.schemas import HashMethod, hash_functions
+from src.kafka_manager import KafkaManager
+from src.config import KAFKA_SERVERS
 
 
 router = APIRouter(
@@ -9,11 +12,15 @@ router = APIRouter(
     tags=["Сryptography"],
 )
 
+kafka_manager = KafkaManager(bootstrap_servers=KAFKA_SERVERS)
+
+
 async def validate_input(text: str | None, upload_file: UploadFile | None):
     if text and upload_file:
         raise HTTPException(status_code=400, detail="Hash error: must be either text or file")
     if not text and not upload_file:
         raise HTTPException(status_code=400, detail="Hash error: no information provided for hashing")
+
 
 @router.post("/hash/")
 async def generate_hash(method: Annotated[HashMethod, Form(description="Метод хэширования")],
@@ -34,6 +41,17 @@ async def generate_hash(method: Annotated[HashMethod, Form(description="Мето
             content = content.encode()
 
         hash = hash_functions[method](content).hexdigest()
+
+        # Отправка события в Kafka
+        event = {
+            "event": "HASH_TEXT",
+            "details": {
+                "text_length": len(hash),
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+        await kafka_manager.send_event("hash_log", event)
+
 
         if file_name:
             return {

@@ -9,13 +9,13 @@ from src.auth.jwt.router import router as router_jwt
 
 app = FastAPI(
     title="Afina",
-    description="Шифрование, хэъ, видео, БД",
-    version="0.0.2"
+    description="Шифрование, хэш, видео, БД, JWT, Redis, Kafka",
+    version="0.0.4"
 )
 
-#app.include_router(router_cryptography_symmetric_encryption)
-#app.include_router(router_cryptography_hash)
+app.include_router(router_cryptography_symmetric_encryption)
+app.include_router(router_cryptography_hash)
 
-#app.include_router(router_video)
+app.include_router(router_video)
 
 app.include_router(router_jwt)

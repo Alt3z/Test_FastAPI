@@ -4,6 +4,12 @@ file/
 
 **/__pycache__/
 
-src/create_tables.py
+kafka/Kafka.txt
+
+kafka/enc_log.txt
+kafka/hash_log.txt
+
+src/scripts
+
 src/video/my_videos
 src/cryptography/encrypted_files
